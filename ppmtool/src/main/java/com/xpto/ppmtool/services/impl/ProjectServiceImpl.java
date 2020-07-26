@@ -1,7 +1,9 @@
 package com.xpto.ppmtool.services.impl;
 
+import com.xpto.ppmtool.domain.Backlog;
 import com.xpto.ppmtool.domain.Project;
 import com.xpto.ppmtool.exceptions.ProjectIdException;
+import com.xpto.ppmtool.repositories.BacklogRepository;
 import com.xpto.ppmtool.repositories.ProjectRepository;
 import com.xpto.ppmtool.services.ProjectService;
 import org.springframework.stereotype.Service;
@@ -12,19 +14,37 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final BacklogRepository backlogRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, BacklogRepository backlogRepository) {
         this.projectRepository = projectRepository;
+        this.backlogRepository = backlogRepository;
     }
 
     @Override
     public Project saveOrUpdateProject(Project project){
 
+        String projectIdentifier = project.getProjectIdentifier().toUpperCase();
+
         try{
-            project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+            project.setProjectIdentifier(projectIdentifier);
+
+            //If it is the creation of a new Project, create a new Backlog associated with it
+            if(project.getId() == null){
+                Backlog backlog = new Backlog();
+                project.setBacklog(backlog);
+                backlog.setProject(project);
+                backlog.setProjectIdentifier(projectIdentifier);
+            }
+
+            //If it is the update of an existent Project then set the correspondent Backlog
+            if(project.getId() != null){
+                project.setBacklog(this.backlogRepository.findByProjectIdentifier(projectIdentifier));
+            }
+
             return projectRepository.save(project);
         }catch (Exception e){
-            throw new ProjectIdException("Project ID '" + project.getProjectIdentifier().toUpperCase() + "' already exists");
+            throw new ProjectIdException("Project ID '" + projectIdentifier + "' already exists");
         }
     }
 

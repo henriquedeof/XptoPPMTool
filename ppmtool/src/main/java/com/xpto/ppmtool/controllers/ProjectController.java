@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/project")
+//@CrossOrigin //This avoid the CORS error also known as Access-Control-Allow-Origin (Cross Origin)
 public class ProjectController {
 
     private final ProjectService projectService;
