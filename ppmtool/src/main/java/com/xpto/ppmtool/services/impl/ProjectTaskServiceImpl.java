@@ -39,7 +39,7 @@ public class ProjectTaskServiceImpl implements ProjectTaskService {
             projectTask.setProjectIdentifier(projectIdentifier);
 
             //If priority is not set, the default is 0.
-            if(projectTask.getPriority() == null){
+            if(projectTask.getStatus() == "" || projectTask.getPriority() == null){
                 projectTask.setPriority(3);
             }
 

@@ -1,23 +1,62 @@
 import React, {Component} from 'react';
 import {Link} from "react-router-dom";
 import Backlog from "./Backlog";
-import {connect, Connect} from "react-redux";
-import classnames from "classnames";
+import {connect} from "react-redux";
 import PropTypes from "prop-types";
 import {getBacklog} from "../../actions/backlogActions";
 
 
 class ProjectBoard extends Component {
 
+    constructor() {
+        super();
+
+        this.state = {
+            errors: {}
+        };
+
+    }
+
     componentDidMount() {
         const {id} = this.props.match.params;//get ID from the Rout URL
         this.props.getBacklog(id);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.errors){
+            this.setState({errors: nextProps.errors});
+        }
     }
 
     render() {
 
         const {id} = this.props.match.params;//Gettind ID that comes from the URL set on the App.js.
         const {project_tasks} = this.props.backlog;
+        const {errors} = this.state;
+
+        let BoardContent;
+
+        const boardAlgorithm = (errors, project_tasks) => {
+            if(project_tasks.length < 1){
+                if(errors.projectNotFound){//JSON that comes from the server when I pass a invalid Project Identifier.
+                    return(
+                        <div className="alert alert-danger text-center" role="alert">
+                            {errors.projectNotFound}
+                        </div>
+                    );
+                }else{
+                    return (
+                        <div className="alert alert-info text-center" role="alert">
+                            No Project Task on this backlog
+                        </div>
+                    )
+                }
+            } else {
+                return <Backlog project_tasks_prop={project_tasks}/>;
+            }
+        };
+
+        BoardContent = boardAlgorithm(errors, project_tasks);
 
         return (
             <div className="container">
@@ -26,7 +65,7 @@ class ProjectBoard extends Component {
                 </Link>
                 <br/>
                 <hr/>
-                <Backlog project_tasks_prop={project_tasks}/>
+                {BoardContent}
             </div>
 
         );
@@ -35,13 +74,13 @@ class ProjectBoard extends Component {
 
 ProjectBoard.propTypes = {
     backlog: PropTypes.object.isRequired,
-    getBacklog: PropTypes.func.isRequired
-    //errors: PropTypes.object.isRequired
+    getBacklog: PropTypes.func.isRequired,
+    errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-    backlog: state.backlog
-    //errors: state.errors
+    backlog: state.backlog,
+    errors: state.errors //retrieving errors from state
 });
 
 export default connect(mapStateToProps, {getBacklog}) (ProjectBoard);
