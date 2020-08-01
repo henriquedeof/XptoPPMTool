@@ -18,7 +18,7 @@ class ProjectBoard extends Component {
     }
 
     componentDidMount() {
-        const {id} = this.props.match.params;//get ID from the Rout URL
+        const {id} = this.props.match.params;//get ID from the Route URL
         this.props.getBacklog(id);
     }
 
