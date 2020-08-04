@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -32,7 +33,7 @@ public class ProjectController {
     //NOTE: In this course, Carlos is using this method to create or update a Project. This is considered a BAD practice as update methods should use PUT but not POST HTTP method.
     //      I am leaving as it is just to follow the course, but when the course is finished, I must correct it and use a different method.
     @PostMapping
-    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult bindingResult){
+    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult bindingResult, Principal principal){
         //Without the @Valid I was getting a 500 server error. With it, my response is a 400 bad request
 
         ResponseEntity<?> errorMap = MapValidationError.getMapValidation(bindingResult);//validating Inputs of project param.
@@ -40,7 +41,7 @@ public class ProjectController {
             return errorMap;
         }
 
-        Project savedProject = this.projectService.saveOrUpdateProject(project);
+        Project savedProject = this.projectService.saveOrUpdateProject(project, principal.getName());
         return new ResponseEntity<Project>(savedProject, HttpStatus.CREATED);
 
 

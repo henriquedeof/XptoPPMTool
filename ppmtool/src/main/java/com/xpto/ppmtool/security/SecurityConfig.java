@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +28,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService,
+                          BCryptPasswordEncoder bCryptPasswordEncoder) {
+
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.customUserDetailsService = customUserDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -43,6 +46,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
+
+    @Bean
+    JwtAuthenticationFilter jwtAuthenticationFilter(){
+        //return new JwtAuthenticationFilter(); //code provided by the course. This class was using field injection. The class below uses constructor injection
+        //NOTE: Instead of instantiating JwtTokenProvider() as a parameter, I could inject a new attribute jwtTokenProvider of JwtTokenProvider type.
+        return new JwtAuthenticationFilter(new JwtTokenProvider(), customUserDetailsService);
+    }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -65,6 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();
+
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
     }
 
 

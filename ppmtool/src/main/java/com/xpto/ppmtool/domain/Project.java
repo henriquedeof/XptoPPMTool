@@ -49,6 +49,12 @@ public class Project {
     @JsonIgnore //Adding this annotation as, according to the course, it is not necessary to show the tasks here, only the Project information.
     private Backlog backlog;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
+
+    private String projectLeader;
+
     //-----------
 
     @JsonFormat(pattern = "yyyy-mm-dd")

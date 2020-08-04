@@ -2,9 +2,11 @@ package com.xpto.ppmtool.services.impl;
 
 import com.xpto.ppmtool.domain.Backlog;
 import com.xpto.ppmtool.domain.Project;
+import com.xpto.ppmtool.domain.User;
 import com.xpto.ppmtool.exceptions.ProjectIdException;
 import com.xpto.ppmtool.repositories.BacklogRepository;
 import com.xpto.ppmtool.repositories.ProjectRepository;
+import com.xpto.ppmtool.repositories.UserRepository;
 import com.xpto.ppmtool.services.ProjectService;
 import org.springframework.stereotype.Service;
 
@@ -15,19 +17,25 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final BacklogRepository backlogRepository;
+    private final UserRepository userRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, BacklogRepository backlogRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, BacklogRepository backlogRepository, UserRepository userRepository) {
         this.projectRepository = projectRepository;
         this.backlogRepository = backlogRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Project saveOrUpdateProject(Project project){
+    public Project saveOrUpdateProject(Project project, String username){
 
         String projectIdentifier = project.getProjectIdentifier().toUpperCase();
 
         try{
+            User user = this.userRepository.findByUsername(username);
+
             project.setProjectIdentifier(projectIdentifier);
+            project.setProjectLeader(user.getUsername());
+            project.setUser(user);
 
             //If it is the creation of a new Project, create a new Backlog associated with it
             if(project.getId() == null){

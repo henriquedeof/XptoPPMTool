@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProjectService {
 
-    Project saveOrUpdateProject(Project project);
+    Project saveOrUpdateProject(Project project, String username);
 
     Project findProjectByIdentifier(String projectIdentifier);
 
