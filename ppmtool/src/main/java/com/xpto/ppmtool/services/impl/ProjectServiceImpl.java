@@ -4,13 +4,12 @@ import com.xpto.ppmtool.domain.Backlog;
 import com.xpto.ppmtool.domain.Project;
 import com.xpto.ppmtool.domain.User;
 import com.xpto.ppmtool.exceptions.ProjectIdException;
+import com.xpto.ppmtool.exceptions.ProjectNotFoundException;
 import com.xpto.ppmtool.repositories.BacklogRepository;
 import com.xpto.ppmtool.repositories.ProjectRepository;
 import com.xpto.ppmtool.repositories.UserRepository;
 import com.xpto.ppmtool.services.ProjectService;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -30,7 +29,18 @@ public class ProjectServiceImpl implements ProjectService {
 
         String projectIdentifier = project.getProjectIdentifier().toUpperCase();
 
+        if(project.getId() != null){//verifying if it is an update
+            Project existingProject = this.projectRepository.findByProjectIdentifier(projectIdentifier);
+
+            if(existingProject != null && (!project.getProjectLeader().equals(username))){
+                throw new ProjectNotFoundException("Project not found in your account");
+            }else if(existingProject == null){
+                throw new ProjectNotFoundException("Project with ID '" + projectIdentifier + "' cannot be updated because it does not exist");
+            }
+        }
+
         try{
+
             User user = this.userRepository.findByUsername(username);
 
             project.setProjectIdentifier(projectIdentifier);
@@ -57,29 +67,27 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project findProjectByIdentifier(String projectIdentifier) {
+    public Project findProjectByIdentifier(String projectIdentifier, String username) {
         Project project = this.projectRepository.findByProjectIdentifier(projectIdentifier.toUpperCase());
         if(project == null){
             throw new ProjectIdException("Project ID '" + projectIdentifier + "' does not exist");
+        }
+
+        if(!project.getProjectLeader().equals(username)){
+            throw new ProjectNotFoundException("Project not found in your account");
         }
 
         return project;
     }
 
     @Override
-    public List<Project> findAllProjects() {
-        return this.projectRepository.findAll();
+    public Iterable<Project> findAllProjects(String username) {
+        return this.projectRepository.findAllByProjectLeader(username);
     }
 
     @Override
-    public void deleteProjectByIdentifier(String identifier) {
-        Project project = this.findProjectByIdentifier(identifier);
-
-        //I believe I do not need this IF code as the findProjectByIdentifier() method already validates whether Project exists or not
-//        if(project == null){
-//            throw new ProjectIdException("Project ID '" + identifier + "' does not exist1111111");
-//        }
-
+    public void deleteProjectByIdentifier(String identifier, String username) {
+        Project project = this.findProjectByIdentifier(identifier, username);
         this.projectRepository.delete(project);
     }
 

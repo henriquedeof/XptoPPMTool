@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/project")
@@ -58,23 +57,23 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectIdentifier}")
-    public ResponseEntity<?> findProjectByIdentifier(@PathVariable String projectIdentifier){
-        Project project = this.projectService.findProjectByIdentifier(projectIdentifier);
+    public ResponseEntity<?> findProjectByIdentifier(@PathVariable String projectIdentifier, Principal principal){
+        Project project = this.projectService.findProjectByIdentifier(projectIdentifier, principal.getName());
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
 
     @GetMapping("/all")
-    public List<Project> getAllProjects(){
+    public Iterable<Project> getAllProjects(Principal principal){
         /*
         Apparently, the way this list is structured is not right. The PROBABLE correct way may be found on Jonh's project.
         */
 
-        return this.projectService.findAllProjects();//Do not need any kind of validation as if the there is no Projects available, the list will be empty.
+        return this.projectService.findAllProjects(principal.getName());//Do not need any kind of validation as if the there is no Projects available, the list will be empty.
     }
 
     @DeleteMapping("/{projectIndetifier}")
-    public ResponseEntity<?> deleteProject(@PathVariable String projectIndetifier){
-        this.projectService.deleteProjectByIdentifier(projectIndetifier);
+    public ResponseEntity<?> deleteProject(@PathVariable String projectIndetifier, Principal principal){
+        this.projectService.deleteProjectByIdentifier(projectIndetifier, principal.getName());
 
         return new ResponseEntity<String>("Project with ID: '" + projectIndetifier + "' was deleted", HttpStatus.OK);
     }

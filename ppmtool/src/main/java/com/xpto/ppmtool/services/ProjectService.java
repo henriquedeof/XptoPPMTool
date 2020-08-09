@@ -2,16 +2,14 @@ package com.xpto.ppmtool.services;
 
 import com.xpto.ppmtool.domain.Project;
 
-import java.util.List;
-
 public interface ProjectService {
 
     Project saveOrUpdateProject(Project project, String username);
 
-    Project findProjectByIdentifier(String projectIdentifier);
+    public Iterable<Project> findAllProjects(String username);
 
-    List<Project> findAllProjects();
+    Project findProjectByIdentifier(String projectIdentifier, String username);
 
-    void deleteProjectByIdentifier(String identifier);
+    void deleteProjectByIdentifier(String identifier, String username);
 
 }

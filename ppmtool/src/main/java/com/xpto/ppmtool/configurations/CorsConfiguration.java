@@ -14,7 +14,7 @@ public class CorsConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 //Accepting any URL and the methods: GET, POST, PUT, DELETE and OPTIONS.
-                registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+                registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH");
             }
         };
     }
