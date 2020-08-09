@@ -37,11 +37,17 @@ class ProjectBoard extends Component {
         let BoardContent;
 
         const boardAlgorithm = (errors, project_tasks) => {
-            if(project_tasks.length < 1){
-                if(errors.projectNotFound){//JSON that comes from the server when I pass a invalid Project Identifier.
-                    return(
+            if(project_tasks.length < 1) {
+                if (errors.projectNotFound) {//JSON that comes from the server when I pass a invalid Project Identifier.
+                    return (
                         <div className="alert alert-danger text-center" role="alert">
                             {errors.projectNotFound}
+                        </div>
+                    );
+                }else if(errors.projectIdentifier){
+                    return (
+                        <div className="alert alert-danger text-center" role="alert">
+                            {errors.projectIdentifier}
                         </div>
                     );
                 }else{
