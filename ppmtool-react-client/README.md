@@ -1,5 +1,19 @@
-###This project was created on:
+##This project was created on:
 https://henrique-ppm-tool.herokuapp.com
+
+##Original package.json file:
+"start": "react-scripts start", 
+"build": "react-scripts build",
+"test": "react-scripts test",
+"eject": "react-scripts eject"
+
+##Modified for production package.json file:
+"dev": "react-scripts start",
+    "start": "serve -s build",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "npm run build"
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
